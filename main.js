@@ -20,36 +20,37 @@ function logout() {
     document.getElementById('todoBody').innerHTML = '';
 }
 
+
 function fetchTodos() {
     fetch('https://jsonplaceholder.typicode.com/todos')
         .then(response => response.json())
         .then(data => {
             const todoBody = document.getElementById('todoBody');
-            todoBody.innerHTML = '';
+            todoBody.innerHTML = ''; 
 
             data.forEach(todo => {
                 const row = document.createElement('tr');
 
                 
-
                 const idCell = document.createElement('td');
                 idCell.textContent = todo.id;
+
+                
                 const titleCell = document.createElement('td');
                 titleCell.textContent = todo.title;
-                const completedCell = document.createElement('td');
-                
-                
 
+                
+                const completedCell = document.createElement('td');
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = todo.completed;
 
-              
-
+                
                 if (!todo.completed) {
-                    checkbox.addEventListener('click', () => {
+                    checkbox.addEventListener('change', () => {
+                        
                         todo.completed = checkbox.checked;
-                   
+                        updateTodoStatus(todo.id, todo.completed);
                     });
                 } else {
                     checkbox.disabled = true;
@@ -64,4 +65,20 @@ function fetchTodos() {
             });
         })
         .catch(error => console.error('Error fetching todos:', error));
+}
+
+
+function updateTodoStatus(id, completed) {
+    fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ completed })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(`Todo ${id} updated successfully:`, data);
+    })
+    .catch(error => console.error('Error updating todo:', error));
 }
